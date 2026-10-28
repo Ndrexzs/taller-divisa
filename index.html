@@ -584,7 +584,8 @@
       }
     }
 
-    // Llamada API al CRM
+    
+    // Llamada API al CRM con bypass de CORS
     async function callCRM(toolName, args = {}) {
       const token = getToken();
       if (!token) {
@@ -593,44 +594,62 @@
         return null;
       }
 
-      try {
-        const res = await fetch(CRM_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json, text/event-stream",
-            "Authorization": `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            jsonrpc: "2.0",
-            id: mcpIdCounter++,
-            method: "tools/call",
-            params: {
-              name: toolName,
-              arguments: args
-            }
-          })
-        });
-
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        
-        let text = await res.text();
-        if (text.startsWith("event: message")) {
-          const lines = text.split("\n");
-          const dataLine = lines.find(l => l.startsWith("data: "));
-          if (dataLine) text = dataLine.slice(6).trim();
+      const payload = JSON.stringify({
+        jsonrpc: "2.0",
+        id: mcpIdCounter++,
+        method: "tools/call",
+        params: {
+          name: toolName,
+          arguments: args
         }
+      });
 
-        const json = JSON.parse(text);
-        if (json?.result?.content?.[0]?.text) {
-          try {
-            return JSON.parse(json.result.content[0].text);
-          } catch {
-            return json.result.content[0].text;
+      // Intentamos endpoints: 1. Proxy CORS gratuito y ultra-rápido, 2. Bridge local si estuviera disponible
+      const endpoints = [
+        "https://corsproxy.io/?" + encodeURIComponent(CRM_URL),
+        "https://api.allorigins.win/raw?url=" + encodeURIComponent(CRM_URL),
+        CRM_URL
+      ];
+
+      for (const endpoint of endpoints) {
+        try {
+          const res = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json, text/event-stream",
+              "Authorization": "Bearer " + token
+            },
+            body: payload
+          });
+
+          if (!res.ok) continue;
+
+          let text = await res.text();
+          if (text.startsWith("event: message")) {
+            const lines = text.split("\n");
+            const dataLine = lines.find(l => l.startsWith("data: "));
+            if (dataLine) text = dataLine.slice(6).trim();
           }
+
+          const json = JSON.parse(text);
+          if (json?.result?.content?.[0]?.text) {
+            try {
+              return JSON.parse(json.result.content[0].text);
+            } catch {
+              return json.result.content[0].text;
+            }
+          }
+          return json?.result?.structuredContent || json;
+        } catch (e) {
+          // Intentar siguiente endpoint
         }
-        return json?.result?.structuredContent || json;
-      } catch (err) {
+      }
+
+      setConnectionStatus(false, "Error de Red / CORS");
+      return null;
+    }
+ catch (err) {
         console.error("Error CRM:", err);
         setConnectionStatus(false, "Desconectado");
         return null;
