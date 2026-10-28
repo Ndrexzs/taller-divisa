@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Control Taller - Divisa Automotores</title>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --panel-bg: #1e293b;
+      --card-bg: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-blue: #3b82f6;
+      --accent-green: #22c55e;
+      --accent-amber: #f59e0b;
+      --accent-purple: #a855f7;
+      --border-color: #475569;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none; /* Ideal para táctil / kiosco */
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Header Superior */
+    header {
+      background-color: var(--panel-bg);
+      border-bottom: 2px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-badge {
+      background: #2563eb;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .header-info {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .clock {
+      font-size: 20px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: #38bdf8;
+      background: #0f172a;
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .refresh-btn {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .refresh-btn:hover {
+      background: #2563eb;
+    }
+
+    /* Barra Rápida de Mecánicos (Filtro / Asignador rápido) */
+    .mechanics-bar {
+      background-color: #1e293b;
+      padding: 8px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+    }
+
+    .mechanics-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+
+    .mech-chip {
+      background: #334155;
+      color: #e2e8f0;
+      border: 1px solid #475569;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mech-chip:hover, .mech-chip.active {
+      background: #3b82f6;
+      color: #ffffff;
+      border-color: #60a5fa;
+      transform: translateY(-1px);
+    }
+
+    /* Tablero Kanban */
+    .kanban-board {
+      flex: 1;
+      display: flex;
+      gap: 16px;
+      padding: 20px 24px;
+      overflow-x: auto;
+      align-items: stretch;
+    }
+
+    .kanban-column {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      width: 320px;
+      min-width: 320px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+
+    .column-header {
+      padding: 14px 16px;
+      border-bottom: 2px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .column-title {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .column-count {
+      background: #0f172a;
+      color: #38bdf8;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .column-body {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .column-body.drag-over {
+      background: rgba(59, 130, 246, 0.1);
+      border: 2px dashed #3b82f6;
+      border-radius: 8px;
+    }
+
+    /* Tarjetas de Trabajo */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px;
+      cursor: grab;
+      transition: all 0.2s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      position: relative;
+    }
+
+    .card:hover {
+      border-color: #60a5fa;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+    }
+
+    .card:active {
+      cursor: grabbing;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .card-vehicle {
+      font-size: 16px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .card-service-type {
+      background: #1e1b4b;
+      color: #c7d2fe;
+      border: 1px solid #4338ca;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: #cbd5e1;
+      margin-bottom: 12px;
+      line-height: 1.4;
+      background: #1e293b;
+      padding: 8px 10px;
+      border-radius: 6px;
+    }
+
+    .card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 8px;
+    }
+
+    .card-mechanic {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .mech-badge {
+      background: #0284c7;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .mech-badge.unassigned {
+      background: #eab308;
+      color: #000;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .btn-quick {
+      background: #1e293b;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .btn-quick:hover {
+      background: #3b82f6;
+    }
+
+    /* Modal de Selección Rápida de Mecánico (Táctil / Cero Teclado) */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal {
+      background: #1e293b;
+      border: 2px solid #3b82f6;
+      border-radius: 16px;
+      width: 480px;
+      max-width: 90vw;
+      padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-header {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .modal-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .mechanics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .mech-btn-tile {
+      background: #334155;
+      border: 2px solid #475569;
+      color: #ffffff;
+      padding: 14px 10px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .mech-btn-tile:hover {
+      background: #2563eb;
+      border-color: #60a5fa;
+      transform: scale(1.03);
+    }
+
+    .modal-close-btn {
+      width: 100%;
+      background: #475569;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-title">
+        🛠️ DIVISA AUTOMOTORES <span class="brand-badge">Panel Taller</span>
+      </div>
+    </div>
+    <div class="header-info">
+      <div class="clock" id="liveClock">13:15:00</div>
+      <button class="refresh-btn" onclick="fetchLiveCards()">
+        🔄 Actualizar
+      </button>
+    </div>
+  </header>
+
+  <!-- Barra de Filtro Rápido de Mecánicos -->
+  <div class="mechanics-bar">
+    <span class="mechanics-label">Ver por Mecánico:</span>
+    <button class="mech-chip active" onclick="filterMechanic('TODOS', this)">Todos</button>
+    <button class="mech-chip" onclick="filterMechanic('CLETO', this)">Cleto</button>
+    <button class="mech-chip" onclick="filterMechanic('ADILIO', this)">Adilio</button>
+    <button class="mech-chip" onclick="filterMechanic('FRANCISCO', this)">Francisco</button>
+    <button class="mech-chip" onclick="filterMechanic('VICTOR', this)">Victor</button>
+    <button class="mech-chip" onclick="filterMechanic('ANDERSON', this)">Anderson</button>
+    <button class="mech-chip" onclick="filterMechanic('ENRIQUE', this)">Enrique</button>
+    <button class="mech-chip" onclick="filterMechanic('LUIS ESPINOLA', this)">Luis Espínola</button>
+    <button class="mech-chip" onclick="filterMechanic('JUNIOR', this)">Junior</button>
+    <button class="mech-chip" onclick="filterMechanic('DOMINGO ADRIAN', this)">Domingo Adrián</button>
+  </div>
+
+  <!-- Tablero Kanban -->
+  <div class="kanban-board" id="kanbanBoard">
+
+    <!-- 1. Recepcionado / En Espera -->
+    <div class="kanban-column" data-stage="ca50d724-bfb0-4b41-b501-aea5d39e6174">
+      <div class="column-header" style="border-top: 4px solid #3b82f6;">
+        <div class="column-title">📥 1. En Espera</div>
+        <div class="column-count" id="count-espera">0</div>
+      </div>
+      <div class="column-body" id="col-espera" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'ca50d724-bfb0-4b41-b501-aea5d39e6174')">
+      </div>
+    </div>
+
+    <!-- 2. En Trabajo -->
+    <div class="kanban-column" data-stage="3ab97aeb-4285-4976-a0b3-84142068f4ad">
+      <div class="column-header" style="border-top: 4px solid #f59e0b;">
+        <div class="column-title">🔧 2. En Trabajo</div>
+        <div class="column-count" id="count-trabajo">0</div>
+      </div>
+      <div class="column-body" id="col-trabajo" ondragover="allowDrop(event)" ondrop="handleDrop(event, '3ab97aeb-4285-4976-a0b3-84142068f4ad')">
+      </div>
+    </div>
+
+    <!-- 3. Esperando Repuestos -->
+    <div class="kanban-column" data-stage="25ea25e6-69eb-4b93-8cad-5fc2b96b9e31">
+      <div class="column-header" style="border-top: 4px solid #ef4444;">
+        <div class="column-title">⏳ 3. Repuestos</div>
+        <div class="column-count" id="count-repuestos">0</div>
+      </div>
+      <div class="column-body" id="col-repuestos" ondragover="allowDrop(event)" ondrop="handleDrop(event, '25ea25e6-69eb-4b93-8cad-5fc2b96b9e31')">
+      </div>
+    </div>
+
+    <!-- 4. Listo / Lavado -->
+    <div class="kanban-column" data-stage="fef5b588-38bd-49ae-bd24-41aa81a39c8a">
+      <div class="column-header" style="border-top: 4px solid #a855f7;">
+        <div class="column-title">🧼 4. Listo / Lavado</div>
+        <div class="column-count" id="count-lavado">0</div>
+      </div>
+      <div class="column-body" id="col-lavado" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'fef5b588-38bd-49ae-bd24-41aa81a39c8a')">
+      </div>
+    </div>
+
+    <!-- 5. Entregado -->
+    <div class="kanban-column" data-stage="210876e7-a811-45a5-9376-f518e140016c">
+      <div class="column-header" style="border-top: 4px solid #22c55e;">
+        <div class="column-title">✅ 5. Entregado</div>
+        <div class="column-count" id="count-entregado">0</div>
+      </div>
+      <div class="column-body" id="col-entregado" ondragover="allowDrop(event)" ondrop="handleDrop(event, '210876e7-a811-45a5-9376-f518e140016c')">
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal Táctil: Asignar Mecánico (Cero Teclado) -->
+  <div class="modal-overlay" id="mechModal">
+    <div class="modal">
+      <div class="modal-header">Asignar Mecánico</div>
+      <div class="modal-sub" id="modalCardTitle">Vehículo seleccionado</div>
+
+      <div class="mechanics-grid">
+        <button class="mech-btn-tile" onclick="assignMechanicToCard('CLETO')">CLETO</button>
+        <button class="mech-btn-tile" onclick="assignMechanicToCard('ADILIO')">ADILIO</button>
+        <button class="mech-btn-tile" onclick="assignMechanicToCard('FRANCISCO')">FRANCISCO</button>
+        <button class="mech-btn-tile" onclick="assignMechanicToCard('VICTOR')">VICTOR</button>
+        <button class="mech-btn-tile" onclick="assignMechanicToCard('ANDERSON')">ANDERSON</button>
+        <button class="mech-btn-tile" onclick="assignMechanicToCard('ENRIQUE')">ENRIQUE</button>
+        <button class="mech-btn-tile" onclick="assignMechanicToCard('LUIS ESPINOLA')">LUIS ESP.</button>
+        <button class="mech-btn-tile" onclick="assignMechanicToCard('JUNIOR')">JUNIOR</button>
+        <button class="mech-btn-tile" onclick="assignMechanicToCard('DOMINGO ADRIAN')">DOMINGO A.</button>
+      </div>
+
+      <button class="modal-close-btn" onclick="closeModal()">Cancelar</button>
+    </div>
+  </div>
+
+  <script>
+    // Datos locales reactivos sincronizados
+    const STAGE_MAP = {
+      "ca50d724-bfb0-4b41-b501-aea5d39e6174": "col-espera",
+      "3ab97aeb-4285-4976-a0b3-84142068f4ad": "col-trabajo",
+      "25ea25e6-69eb-4b93-8cad-5fc2b96b9e31": "col-repuestos",
+      "fef5b588-38bd-49ae-bd24-41aa81a39c8a": "col-lavado",
+      "210876e7-a811-45a5-9376-f518e140016c": "col-entregado"
+    };
+
+    let cardsData = [
+      {
+        id: "e9851168-5bb8-44cc-a3b6-c659d547eca1",
+        vehicle: "Toyota Hilux Blanca",
+        serviceType: "Service 10.000 km",
+        description: "Aceite y filtros. Ruido en suspensión delantera.",
+        mechanic: "CLETO",
+        stageId: "ca50d724-bfb0-4b41-b501-aea5d39e6174"
+      },
+      {
+        id: "demo-card-2",
+        vehicle: "Chevrolet S10 Gris",
+        serviceType: "Frenos y Suspensión",
+        description: "Cambio de pastillas y rectificación de discos.",
+        mechanic: "ADILIO",
+        stageId: "3ab97aeb-4285-4976-a0b3-84142068f4ad"
+      },
+      {
+        id: "demo-card-3",
+        vehicle: "Toyota Fortuner Negra",
+        serviceType: "Aire Acondicionado",
+        description: "No enfría. Carga de gas y revisión compresor.",
+        mechanic: "JUNIOR",
+        stageId: "25ea25e6-69eb-4b93-8cad-5fc2b96b9e31"
+      }
+    ];
+
+    let currentFilter = 'TODOS';
+    let selectedCardIdForModal = null;
+
+    // Reloj en Vivo
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('liveClock').innerText = now.toLocaleTimeString('es-PY');
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Renderizar Tarjetas
+    function renderBoard() {
+      // Limpiar columnas
+      Object.values(STAGE_MAP).forEach(colId => {
+        const el = document.getElementById(colId);
+        if (el) el.innerHTML = '';
+      });
+
+      const counts = { espera: 0, trabajo: 0, repuestos: 0, lavado: 0, entregado: 0 };
+
+      cardsData.forEach(card => {
+        // Filtrado
+        if (currentFilter !== 'TODOS' && card.mechanic !== currentFilter) {
+          return;
+        }
+
+        const colId = STAGE_MAP[card.stageId] || 'col-espera';
+        const colEl = document.getElementById(colId);
+
+        // Contadores
+        if (colId === 'col-espera') counts.espera++;
+        if (colId === 'col-trabajo') counts.trabajo++;
+        if (colId === 'col-repuestos') counts.repuestos++;
+        if (colId === 'col-lavado') counts.lavado++;
+        if (colId === 'col-entregado') counts.entregado++;
+
+        const cardEl = document.createElement('div');
+        cardEl.className = 'card';
+        cardEl.draggable = true;
+        cardEl.id = `card-${card.id}`;
+        cardEl.ondragstart = (e) => handleDragStart(e, card.id);
+
+        cardEl.innerHTML = `
+          <div class="card-top">
+            <div class="card-vehicle">${card.vehicle}</div>
+          </div>
+          <div class="card-service-type">🛠️ ${card.serviceType}</div>
+          <div class="card-desc">${card.description}</div>
+          <div class="card-bottom">
+            <div class="card-mechanic">
+              <span>Mecánico:</span>
+              <span class="mech-badge ${card.mechanic ? '' : 'unassigned'}" onclick="openMechModal('${card.id}', '${card.vehicle}')">
+                ${card.mechanic || 'Sin asignar'} ✎
+              </span>
+            </div>
+          </div>
+        `;
+
+        if (colEl) colEl.appendChild(cardEl);
+      });
+
+      // Actualizar contadores
+      document.getElementById('count-espera').innerText = counts.espera;
+      document.getElementById('count-trabajo').innerText = counts.trabajo;
+      document.getElementById('count-repuestos').innerText = counts.repuestos;
+      document.getElementById('count-lavado').innerText = counts.lavado;
+      document.getElementById('count-entregado').innerText = counts.entregado;
+    }
+
+    // Drag & Drop
+    function handleDragStart(e, cardId) {
+      e.dataTransfer.setData('text/plain', cardId);
+    }
+
+    function allowDrop(e) {
+      e.preventDefault();
+      e.currentTarget.classList.add('drag-over');
+    }
+
+    function handleDrop(e, newStageId) {
+      e.preventDefault();
+      e.currentTarget.classList.remove('drag-over');
+      const cardId = e.dataTransfer.getData('text/plain');
+      const card = cardsData.find(c => c.id === cardId);
+      if (card) {
+        card.stageId = newStageId;
+        renderBoard();
+        console.log(`[CRM Sync] Moviendo card ${cardId} a stage ${newStageId}`);
+      }
+    }
+
+    // Filtro rápido por mecánico
+    function filterMechanic(mechName, btnEl) {
+      currentFilter = mechName;
+      document.querySelectorAll('.mech-chip').forEach(b => b.classList.remove('active'));
+      btnEl.classList.add('active');
+      renderBoard();
+    }
+
+    // Modal Selección Mecánico (Táctil)
+    function openMechModal(cardId, vehicleName) {
+      selectedCardIdForModal = cardId;
+      document.getElementById('modalCardTitle').innerText = vehicleName;
+      document.getElementById('mechModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('mechModal').style.display = 'none';
+      selectedCardIdForModal = null;
+    }
+
+    function assignMechanicToCard(mechName) {
+      if (selectedCardIdForModal) {
+        const card = cardsData.find(c => c.id === selectedCardIdForModal);
+        if (card) {
+          card.mechanic = mechName;
+          renderBoard();
+        }
+      }
+      closeModal();
+    }
+
+    function fetchLiveCards() {
+      console.log("Recargando datos en vivo...");
+      renderBoard();
+    }
+
+    // Inicio
+    renderBoard();
+  </script>
+</body>
+</html>
