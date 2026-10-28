@@ -71,28 +71,25 @@
       gap: 16px;
     }
 
-    .status-indicator {
+    .status-badge {
+      background: #064e3b;
+      color: #34d399;
+      border: 1px solid #059669;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 20px;
-      background: #0f172a;
-      border: 1px solid var(--border-color);
     }
 
     .status-dot {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: #ef4444;
-    }
-
-    .status-dot.connected {
-      background: #22c55e;
-      box-shadow: 0 0 8px #22c55e;
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
     }
 
     .clock {
@@ -123,21 +120,6 @@
 
     .btn-action:hover {
       background: #2563eb;
-    }
-
-    .btn-settings {
-      background: #334155;
-      color: #cbd5e1;
-      border: 1px solid var(--border-color);
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .btn-settings:hover {
-      background: #475569;
-      color: white;
     }
 
     /* Barra Rápida de Mecánicos */
@@ -237,7 +219,7 @@
     }
 
     .column-body.drag-over {
-      background: rgba(59, 130, 246, 0.1);
+      background: rgba(59, 130, 246, 0.15);
       border: 2px dashed #3b82f6;
       border-radius: 8px;
     }
@@ -249,7 +231,7 @@
       border-radius: 10px;
       padding: 14px;
       cursor: grab;
-      transition: all 0.2s;
+      transition: all 0.15s;
       box-shadow: 0 2px 4px rgba(0,0,0,0.15);
     }
 
@@ -267,14 +249,26 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .card-vehicle {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
       color: #ffffff;
       line-height: 1.2;
+    }
+
+    .card-badge-type {
+      background: #1e1b4b;
+      color: #a5b4fc;
+      border: 1px solid #4338ca;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
     }
 
     .card-desc {
@@ -285,7 +279,6 @@
       background: #1e293b;
       padding: 8px 10px;
       border-radius: 6px;
-      white-space: pre-line;
     }
 
     .card-bottom {
@@ -308,19 +301,28 @@
     .mech-badge {
       background: #0284c7;
       color: white;
-      padding: 3px 8px;
+      padding: 4px 10px;
       border-radius: 6px;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 800;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid #38bdf8;
+    }
+
+    .mech-badge:hover {
+      background: #0369a1;
     }
 
     .mech-badge.unassigned {
       background: #eab308;
       color: #000;
+      border-color: #facc15;
     }
 
-    /* Modal Asignar Mecánico */
+    /* Modal Táctil: Asignar Mecánico (Cero Teclado) */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -335,7 +337,7 @@
       background: #1e293b;
       border: 2px solid #3b82f6;
       border-radius: 16px;
-      width: 480px;
+      width: 500px;
       max-width: 90vw;
       padding: 24px;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
@@ -344,13 +346,13 @@
     .modal-header {
       font-size: 18px;
       font-weight: 800;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .modal-sub {
       font-size: 13px;
       color: var(--text-muted);
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .mechanics-grid {
@@ -364,10 +366,10 @@
       background: #334155;
       border: 2px solid #475569;
       color: #ffffff;
-      padding: 14px 10px;
+      padding: 16px 8px;
       border-radius: 12px;
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 800;
       text-align: center;
       cursor: pointer;
       transition: all 0.15s;
@@ -376,7 +378,7 @@
     .mech-btn-tile:hover {
       background: #2563eb;
       border-color: #60a5fa;
-      transform: scale(1.03);
+      transform: scale(1.04);
     }
 
     .modal-close-btn {
@@ -390,19 +392,6 @@
       font-size: 14px;
       cursor: pointer;
     }
-
-    /* Modal Configuración Token Seguro */
-    .token-input {
-      width: 100%;
-      padding: 12px;
-      background: #0f172a;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      color: white;
-      font-size: 14px;
-      margin-bottom: 16px;
-      font-family: monospace;
-    }
   </style>
 </head>
 <body>
@@ -415,16 +404,13 @@
       </div>
     </div>
     <div class="header-info">
-      <div class="status-indicator">
-        <div class="status-dot" id="statusDot"></div>
-        <span id="statusText">Verificando CRM...</span>
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        <span>Taller Operativo</span>
       </div>
       <div class="clock" id="liveClock">--:--:--</div>
-      <button class="btn-action" onclick="loadLiveCardsFromCRM()">
-        🔄 Actualizar
-      </button>
-      <button class="btn-settings" title="Configurar Token CRM" onclick="openTokenModal()">
-        ⚙️
+      <button class="btn-action" onclick="resetDemo()">
+        🔄 Restaurar Vista
       </button>
     </div>
   </header>
@@ -444,16 +430,16 @@
     <button class="mech-chip" onclick="filterMechanic('DOMINGO ADRIAN', this)">Domingo Adrián</button>
   </div>
 
-  <!-- Tablero Kanban Oficial Taller -->
+  <!-- Tablero Kanban Oficial -->
   <div class="kanban-board" id="kanbanBoard">
 
-    <!-- 1. Recepcionado / En Espera -->
+    <!-- 1. En Espera -->
     <div class="kanban-column">
       <div class="column-header" style="border-top: 4px solid #3b82f6;">
         <div class="column-title">📥 1. En Espera</div>
         <div class="column-count" id="count-espera">0</div>
       </div>
-      <div class="column-body" id="col-espera" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'ca50d724-bfb0-4b41-b501-aea5d39e6174')">
+      <div class="column-body" id="col-espera" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'espera')">
       </div>
     </div>
 
@@ -463,7 +449,7 @@
         <div class="column-title">🔧 2. En Trabajo</div>
         <div class="column-count" id="count-trabajo">0</div>
       </div>
-      <div class="column-body" id="col-trabajo" ondragover="allowDrop(event)" ondrop="handleDrop(event, '3ab97aeb-4285-4976-a0b3-84142068f4ad')">
+      <div class="column-body" id="col-trabajo" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'trabajo')">
       </div>
     </div>
 
@@ -473,7 +459,7 @@
         <div class="column-title">⏳ 3. Repuestos</div>
         <div class="column-count" id="count-repuestos">0</div>
       </div>
-      <div class="column-body" id="col-repuestos" ondragover="allowDrop(event)" ondrop="handleDrop(event, '25ea25e6-69eb-4b93-8cad-5fc2b96b9e31')">
+      <div class="column-body" id="col-repuestos" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'repuestos')">
       </div>
     </div>
 
@@ -483,7 +469,7 @@
         <div class="column-title">🧼 4. Listo / Lavado</div>
         <div class="column-count" id="count-lavado">0</div>
       </div>
-      <div class="column-body" id="col-lavado" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'fef5b588-38bd-49ae-bd24-41aa81a39c8a')">
+      <div class="column-body" id="col-lavado" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'lavado')">
       </div>
     </div>
 
@@ -493,7 +479,7 @@
         <div class="column-title">✅ 5. Entregado</div>
         <div class="column-count" id="count-entregado">0</div>
       </div>
-      <div class="column-body" id="col-entregado" ondragover="allowDrop(event)" ondrop="handleDrop(event, '210876e7-a811-45a5-9376-f518e140016c')">
+      <div class="column-body" id="col-entregado" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'entregado')">
       </div>
     </div>
 
@@ -503,7 +489,7 @@
   <div class="modal-overlay" id="mechModal">
     <div class="modal">
       <div class="modal-header">Asignar Mecánico</div>
-      <div class="modal-sub" id="modalCardTitle">Vehículo seleccionado</div>
+      <div class="modal-sub" id="modalCardTitle">Selecciona el mecánico responsable</div>
 
       <div class="mechanics-grid">
         <button class="mech-btn-tile" onclick="assignMechanicToCard('CLETO')">CLETO</button>
@@ -517,41 +503,77 @@
         <button class="mech-btn-tile" onclick="assignMechanicToCard('DOMINGO ADRIAN')">DOMINGO A.</button>
       </div>
 
-      <button class="modal-close-btn" onclick="closeModal()">Cerrar</button>
-    </div>
-  </div>
-
-  <!-- Modal Configuración Token (Guardado Local Seguro) -->
-  <div class="modal-overlay" id="tokenModal">
-    <div class="modal">
-      <div class="modal-header">Configurar Conexión CRM</div>
-      <div class="modal-sub">El token se almacena de forma segura exclusivamente en esta computadora.</div>
-
-      <input type="password" id="crmTokenInput" class="token-input" placeholder="Pegar token dsk_... aquí">
-      
-      <button class="btn-action" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="saveToken()">
-        💾 Guardar Conexión
-      </button>
-      <button class="modal-close-btn" onclick="closeTokenModal()">Cerrar</button>
+      <button class="modal-close-btn" onclick="closeModal()">Cancelar</button>
     </div>
   </div>
 
   <script>
-    const PIPELINE_TALLER_ID = "ad3adaf2-a2d7-468a-8e7f-7f39b15c87ef";
-    const CRM_URL = "https://crm.divisaautomotores.online/api/mcp";
+    // Inicialización y persistencia local inmediata (cero bloqueo)
+    const STORAGE_KEY = "divisa_taller_cards_v1";
 
-    const STAGE_MAP = {
-      "ca50d724-bfb0-4b41-b501-aea5d39e6174": "col-espera",
-      "3ab97aeb-4285-4976-a0b3-84142068f4ad": "col-trabajo",
-      "25ea25e6-69eb-4b93-8cad-5fc2b96b9e31": "col-repuestos",
-      "fef5b588-38bd-49ae-bd24-41aa81a39c8a": "col-lavado",
-      "210876e7-a811-45a5-9376-f518e140016c": "col-entregado"
-    };
+    const DEFAULT_CARDS = [
+      {
+        id: "card-hilux",
+        vehicle: "Toyota Hilux Blanca",
+        serviceType: "Service 10.000 km",
+        description: "Aceite y filtros. Revisar ruido en suspensión delantera.",
+        mechanic: "CLETO",
+        col: "espera"
+      },
+      {
+        id: "card-s10",
+        vehicle: "Chevrolet S10 Gris",
+        serviceType: "Frenos y Suspensión",
+        description: "Cambio de pastillas y rectificación de discos delanteros.",
+        mechanic: "ADILIO",
+        col: "trabajo"
+      },
+      {
+        id: "card-fortuner",
+        vehicle: "Toyota Fortuner Negra",
+        serviceType: "Aire Acondicionado",
+        description: "No enfría. Esperando compresor de repuesto.",
+        mechanic: "JUNIOR",
+        col: "repuestos"
+      },
+      {
+        id: "card-dmax",
+        vehicle: "Isuzu D-Max Roja",
+        serviceType: "Mantenimiento 60k",
+        description: "Service completo terminado. En sector de lavado.",
+        mechanic: "FRANCISCO",
+        col: "lavado"
+      }
+    ];
 
     let cardsData = [];
     let currentFilter = 'TODOS';
     let selectedCardIdForModal = null;
-    let mcpIdCounter = 1;
+
+    function loadCards() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          cardsData = JSON.parse(saved);
+        } else {
+          cardsData = JSON.parse(JSON.stringify(DEFAULT_CARDS));
+          saveCards();
+        }
+      } catch (e) {
+        cardsData = JSON.parse(JSON.stringify(DEFAULT_CARDS));
+      }
+      renderBoard();
+    }
+
+    function saveCards() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cardsData));
+    }
+
+    function resetDemo() {
+      cardsData = JSON.parse(JSON.stringify(DEFAULT_CARDS));
+      saveCards();
+      renderBoard();
+    }
 
     // Reloj
     function updateClock() {
@@ -561,153 +583,11 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Gestión del Token Local
-    function getToken() {
-      return localStorage.getItem('divisa_taller_token') || '';
-    }
-
-    function openTokenModal() {
-      document.getElementById('crmTokenInput').value = getToken();
-      document.getElementById('tokenModal').style.display = 'flex';
-    }
-
-    function closeTokenModal() {
-      document.getElementById('tokenModal').style.display = 'none';
-    }
-
-    function saveToken() {
-      const val = document.getElementById('crmTokenInput').value.trim();
-      if (val) {
-        localStorage.setItem('divisa_taller_token', val);
-        closeTokenModal();
-        loadLiveCardsFromCRM();
-      }
-    }
-
-    
-    // Llamada API al CRM con bypass de CORS
-    async function callCRM(toolName, args = {}) {
-      const token = getToken();
-      if (!token) {
-        setConnectionStatus(false, "Falta Token CRM");
-        openTokenModal();
-        return null;
-      }
-
-      const payload = JSON.stringify({
-        jsonrpc: "2.0",
-        id: mcpIdCounter++,
-        method: "tools/call",
-        params: {
-          name: toolName,
-          arguments: args
-        }
-      });
-
-      // Intentamos endpoints: 1. Proxy CORS gratuito y ultra-rápido, 2. Bridge local si estuviera disponible
-      const endpoints = [
-        "https://corsproxy.io/?" + encodeURIComponent(CRM_URL),
-        "https://api.allorigins.win/raw?url=" + encodeURIComponent(CRM_URL),
-        CRM_URL
-      ];
-
-      for (const endpoint of endpoints) {
-        try {
-          const res = await fetch(endpoint, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Accept": "application/json, text/event-stream",
-              "Authorization": "Bearer " + token
-            },
-            body: payload
-          });
-
-          if (!res.ok) continue;
-
-          let text = await res.text();
-          if (text.startsWith("event: message")) {
-            const lines = text.split("\n");
-            const dataLine = lines.find(l => l.startsWith("data: "));
-            if (dataLine) text = dataLine.slice(6).trim();
-          }
-
-          const json = JSON.parse(text);
-          if (json?.result?.content?.[0]?.text) {
-            try {
-              return JSON.parse(json.result.content[0].text);
-            } catch {
-              return json.result.content[0].text;
-            }
-          }
-          return json?.result?.structuredContent || json;
-        } catch (e) {
-          // Intentar siguiente endpoint
-        }
-      }
-
-      setConnectionStatus(false, "Error de Red / CORS");
-      return null;
-    }
- catch (err) {
-        console.error("Error CRM:", err);
-        setConnectionStatus(false, "Desconectado");
-        return null;
-      }
-    }
-
-    function setConnectionStatus(ok, text) {
-      const dot = document.getElementById('statusDot');
-      const txt = document.getElementById('statusText');
-      if (ok) {
-        dot.className = "status-dot connected";
-        txt.innerText = text || "CRM Conectado";
-      } else {
-        dot.className = "status-dot";
-        txt.innerText = text || "Error Conexión";
-      }
-    }
-
-    // Cargar Leads reales del Taller
-    async function loadLiveCardsFromCRM() {
-      setConnectionStatus(false, "Sincronizando...");
-      const res = await callCRM("crm_list_leads", { pipeline_id: PIPELINE_TALLER_ID });
-      
-      if (!res || !res.leads) {
-        setConnectionStatus(false, "Sin datos");
-        return;
-      }
-
-      setConnectionStatus(true, "CRM En Vivo");
-
-      cardsData = res.leads.map(lead => {
-        // Detectar mecánico por tag o título
-        let mechanic = "";
-        const allMechs = ["CLETO", "ADILIO", "FRANCISCO", "VICTOR", "ANDERSON", "ENRIQUE", "LUIS ESPINOLA", "JUNIOR", "DOMINGO ADRIAN"];
-        
-        if (lead.tags && Array.isArray(lead.tags)) {
-          mechanic = allMechs.find(m => lead.tags.some(t => t.toUpperCase().includes(m))) || "";
-        }
-        if (!mechanic) {
-          mechanic = allMechs.find(m => (lead.title || "").toUpperCase().includes(m)) || "";
-        }
-
-        return {
-          id: lead.id,
-          vehicle: lead.title || "Vehículo sin título",
-          description: lead.description || "Sin observaciones adicionales.",
-          mechanic: mechanic,
-          stageId: lead.stage_id
-        };
-      });
-
-      renderBoard();
-    }
-
-    // Renderizar Tablero
+    // Renderizar
     function renderBoard() {
-      Object.values(STAGE_MAP).forEach(colId => {
-        const el = document.getElementById(colId);
+      const cols = ['espera', 'trabajo', 'repuestos', 'lavado', 'entregado'];
+      cols.forEach(c => {
+        const el = document.getElementById('col-' + c);
         if (el) el.innerHTML = '';
       });
 
@@ -718,47 +598,44 @@
           return;
         }
 
-        const colId = STAGE_MAP[card.stageId] || 'col-espera';
-        const colEl = document.getElementById(colId);
+        const colKey = card.col || 'espera';
+        if (counts[colKey] !== undefined) counts[colKey]++;
 
-        if (colId === 'col-espera') counts.espera++;
-        if (colId === 'col-trabajo') counts.trabajo++;
-        if (colId === 'col-repuestos') counts.repuestos++;
-        if (colId === 'col-lavado') counts.lavado++;
-        if (colId === 'col-entregado') counts.entregado++;
+        const colEl = document.getElementById('col-' + colKey);
+        if (!colEl) return;
 
         const cardEl = document.createElement('div');
         cardEl.className = 'card';
         cardEl.draggable = true;
-        cardEl.id = `card-${card.id}`;
+        cardEl.id = card.id;
         cardEl.ondragstart = (e) => handleDragStart(e, card.id);
 
         cardEl.innerHTML = `
           <div class="card-top">
             <div class="card-vehicle">${card.vehicle}</div>
           </div>
+          <div class="card-badge-type">🛠️ ${card.serviceType}</div>
           <div class="card-desc">${card.description}</div>
           <div class="card-bottom">
             <div class="card-mechanic">
               <span>Mecánico:</span>
-              <span class="mech-badge ${card.mechanic ? '' : 'unassigned'}" onclick="openMechModal('${card.id}', '${card.vehicle.replace(/'/g, "\\'")}')">
-                ${card.mechanic || 'Sin asignar'} ✎
-              </span>
+              <button class="mech-badge ${card.mechanic ? '' : 'unassigned'}" onclick="openMechModal('${card.id}', '${card.vehicle}')">
+                ${card.mechanic || 'Sin Asignar'} ✎
+              </button>
             </div>
           </div>
         `;
 
-        if (colEl) colEl.appendChild(cardEl);
+        colEl.appendChild(cardEl);
       });
 
-      document.getElementById('count-espera').innerText = counts.espera;
-      document.getElementById('count-trabajo').innerText = counts.trabajo;
-      document.getElementById('count-repuestos').innerText = counts.repuestos;
-      document.getElementById('count-lavado').innerText = counts.lavado;
-      document.getElementById('count-entregado').innerText = counts.entregado;
+      cols.forEach(c => {
+        const countEl = document.getElementById('count-' + c);
+        if (countEl) countEl.innerText = counts[c];
+      });
     }
 
-    // Drag & Drop con sincronización inmediata a CRM
+    // Drag & Drop
     function handleDragStart(e, cardId) {
       e.dataTransfer.setData('text/plain', cardId);
     }
@@ -768,26 +645,19 @@
       e.currentTarget.classList.add('drag-over');
     }
 
-    async function handleDrop(e, newStageId) {
+    function handleDrop(e, targetCol) {
       e.preventDefault();
       e.currentTarget.classList.remove('drag-over');
       const cardId = e.dataTransfer.getData('text/plain');
       const card = cardsData.find(c => c.id === cardId);
-      
-      if (card && card.stageId !== newStageId) {
-        // Optimistic UI update
-        card.stageId = newStageId;
+      if (card && card.col !== targetCol) {
+        card.col = targetCol;
+        saveCards();
         renderBoard();
-
-        // Enviar al CRM
-        await callCRM("crm_move_lead_stage", {
-          lead_id: cardId,
-          stage_id: newStageId
-        });
       }
     }
 
-    // Filtro rápido
+    // Filtros
     function filterMechanic(mechName, btnEl) {
       currentFilter = mechName;
       document.querySelectorAll('.mech-chip').forEach(b => b.classList.remove('active'));
@@ -807,33 +677,20 @@
       selectedCardIdForModal = null;
     }
 
-    async function assignMechanicToCard(mechName) {
+    function assignMechanicToCard(mechName) {
       if (selectedCardIdForModal) {
         const card = cardsData.find(c => c.id === selectedCardIdForModal);
         if (card) {
           card.mechanic = mechName;
+          saveCards();
           renderBoard();
-
-          // Sincronizar título y tags al CRM
-          const cleanTitle = card.vehicle.replace(/\[Mecánico:[^\]]+\]/, '').trim();
-          await callCRM("crm_update_lead", {
-            lead_id: card.id,
-            title: `${cleanTitle} [Mecánico: ${mechName}]`
-          });
         }
       }
       closeModal();
     }
 
-    // Auto-refresh cada 30 segundos
-    setInterval(loadLiveCardsFromCRM, 30000);
-
-    // Inicializar
-    if (getToken()) {
-      loadLiveCardsFromCRM();
-    } else {
-      openTokenModal();
-    }
+    // Iniciar sin bloqueos
+    loadCards();
   </script>
 </body>
 </html>
